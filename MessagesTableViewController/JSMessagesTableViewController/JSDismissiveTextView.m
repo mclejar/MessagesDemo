@@ -28,11 +28,15 @@
 //
 
 #import "JSDismissiveTextView.h"
+#import <CoreLocation/CoreLocation.h>
+#import <InMoji/InMoji.h>
+#import <InMoji/InMojiCampaign.h>
 
-@interface JSDismissiveTextView ()
+@interface JSDismissiveTextView () <InMojiInputDelegate, InMojiLocationProvider, InMojiSelectionDelegate>
 
 @property (strong, nonatomic) UIView *keyboard;
 @property (assign, nonatomic) CGFloat originalKeyboardY;
+@property (nonatomic, strong) CLLocationManager* locationManager;
 
 - (void)handleKeyboardWillShowHideNotification:(NSNotification *)notification;
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan;
@@ -50,9 +54,12 @@
 {
     self = [super initWithFrame:frame];
     if(self) {
-        self.editable = YES;
-        self.inputAccessoryView = [[UIView alloc] init]; // empty view to get a handle on the keyboard when it appears
+//        self.editable = YES;
+//        self.inputAccessoryView = [[UIView alloc] init]; // empty view to get a handle on the keyboard when it appears
         
+        //set delete for input view
+        self.inmojiDelegate = self;
+
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(handleKeyboardWillShowHideNotification:)
                                                      name:UIKeyboardWillShowNotification
@@ -183,6 +190,34 @@
             }
             break;
     }
+}
+
+#pragma mark -
+#pragma InMojiInputDelegate
+- (UIView*)viewForInMojiSelectorDisplay{
+    return self.inputAccessoryView;
+}
+- (CGPoint) originForInMojiSelectorDisplay{
+    return CGPointMake(10.0f,50.0f);
+}
+- (CGFloat) heightForInMojiSelectorDisplay{
+    return 250.0f;
+}
+
+#pragma mark -
+#pragma InMojiLocationProvider
+- (CLLocation*)currentLocation
+{
+    return [_locationManager location];
+}
+
+#pragma mark -
+#pragma InMojiSelectionDelegate
+
+- (BOOL) handleInMojiSelection:(InMojiCampaign*)campaign{
+    BOOL handled = YES;
+    //custom sticker handling
+    return handled;
 }
 
 @end

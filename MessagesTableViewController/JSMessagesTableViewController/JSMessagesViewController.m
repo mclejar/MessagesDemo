@@ -160,7 +160,7 @@
 - (void)sendPressed:(UIButton *)sender
 {
     [self.delegate sendPressed:sender
-                      withText:[self.inputToolBarView.textView.text trimWhitespace]];
+                      withText:[self.inputToolBarView.textView.textContent trimWhitespace]];
 }
 
 #pragma mark - Table view data source
@@ -263,7 +263,7 @@
 
 - (void)finishSend
 {
-    [self.inputToolBarView.textView setText:nil];
+    [self.inputToolBarView.textView  setTextContent:nil];
     [self textViewDidChange:self.inputToolBarView.textView];
     [self.tableView reloadData];
     [self scrollToBottomAnimated:YES];
@@ -288,66 +288,66 @@
 }
 
 #pragma mark - Text view delegate
-- (void)textViewDidBeginEditing:(UITextView *)textView
+- (void)textViewDidBeginEditing:(InMojiInputView *)textView
 {
     [textView becomeFirstResponder];
 	
-    if(!self.previousTextViewContentHeight)
-		self.previousTextViewContentHeight = textView.contentSize.height;
+//    if(!self.previousTextViewContentHeight)
+//		self.previousTextViewContentHeight = textView.contentSize.height;
     
     [self scrollToBottomAnimated:YES];
 }
 
-- (void)textViewDidEndEditing:(UITextView *)textView
+- (void)textViewDidEndEditing:(InMojiInputView *)textView
 {
     [textView resignFirstResponder];
 }
 
-- (void)textViewDidChange:(UITextView *)textView
-{
-    CGFloat maxHeight = [JSMessageInputView maxHeight];
-    CGFloat textViewContentHeight = textView.contentSize.height;
-    BOOL isShrinking = textViewContentHeight < self.previousTextViewContentHeight;
-    CGFloat changeInHeight = textViewContentHeight - self.previousTextViewContentHeight;
+//- (void)textViewDidChange:(InMojiInputView *)textView
+//{
+//    CGFloat maxHeight = [JSMessageInputView maxHeight];
+//    CGFloat textViewContentHeight = textView.contentSize.height;
+//    BOOL isShrinking = textViewContentHeight < self.previousTextViewContentHeight;
+//    CGFloat changeInHeight = textViewContentHeight - self.previousTextViewContentHeight;
     
-    if(!isShrinking && self.previousTextViewContentHeight == maxHeight) {
-        changeInHeight = 0;
-    }
-    else {
-        changeInHeight = MIN(changeInHeight, maxHeight - self.previousTextViewContentHeight);
-    }
-    
-    if(changeInHeight != 0.0f) {
-        if(!isShrinking)
-            [self.inputToolBarView adjustTextViewHeightBy:changeInHeight];
-        
-        [UIView animateWithDuration:0.25f
-                         animations:^{
-                             UIEdgeInsets insets = UIEdgeInsetsMake(0.0f,
-                                                                    0.0f,
-                                                                    self.tableView.contentInset.bottom + changeInHeight,
-                                                                    0.0f);
-                             
-                             self.tableView.contentInset = insets;
-                             self.tableView.scrollIndicatorInsets = insets;
-                             [self scrollToBottomAnimated:NO];
-                             
-                             CGRect inputViewFrame = self.inputToolBarView.frame;
-                             self.inputToolBarView.frame = CGRectMake(0.0f,
-                                                                      inputViewFrame.origin.y - changeInHeight,
-                                                                      inputViewFrame.size.width,
-                                                                      inputViewFrame.size.height + changeInHeight);
-                         }
-                         completion:^(BOOL finished) {
-                             if(isShrinking)
-                                 [self.inputToolBarView adjustTextViewHeightBy:changeInHeight];
-                         }];
-        
-        self.previousTextViewContentHeight = MIN(textViewContentHeight, maxHeight);
-    }
-    
-    self.inputToolBarView.sendButton.enabled = ([textView.text trimWhitespace].length > 0);
-}
+//    if(!isShrinking && self.previousTextViewContentHeight == maxHeight) {
+//        changeInHeight = 0;
+//    }
+//    else {
+//        changeInHeight = MIN(changeInHeight, maxHeight - self.previousTextViewContentHeight);
+//    }
+//    
+//    if(changeInHeight != 0.0f) {
+//        if(!isShrinking)
+//            [self.inputToolBarView adjustTextViewHeightBy:changeInHeight];
+//        
+//        [UIView animateWithDuration:0.25f
+//                         animations:^{
+//                             UIEdgeInsets insets = UIEdgeInsetsMake(0.0f,
+//                                                                    0.0f,
+//                                                                    self.tableView.contentInset.bottom + changeInHeight,
+//                                                                    0.0f);
+//                             
+//                             self.tableView.contentInset = insets;
+//                             self.tableView.scrollIndicatorInsets = insets;
+//                             [self scrollToBottomAnimated:NO];
+//                             
+//                             CGRect inputViewFrame = self.inputToolBarView.frame;
+//                             self.inputToolBarView.frame = CGRectMake(0.0f,
+//                                                                      inputViewFrame.origin.y - changeInHeight,
+//                                                                      inputViewFrame.size.width,
+//                                                                      inputViewFrame.size.height + changeInHeight);
+//                         }
+//                         completion:^(BOOL finished) {
+//                             if(isShrinking)
+//                                 [self.inputToolBarView adjustTextViewHeightBy:changeInHeight];
+//                         }];
+//        
+//        self.previousTextViewContentHeight = MIN(textViewContentHeight, maxHeight);
+//    }
+//    
+//    self.inputToolBarView.sendButton.enabled = ([textView.text trimWhitespace].length > 0);
+//}
 
 #pragma mark - Keyboard notifications
 - (void)handleWillShowKeyboard:(NSNotification *)notification

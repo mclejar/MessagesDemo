@@ -28,6 +28,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <InMoji/InMojiInputView.h>
 
 @protocol JSDismissiveTextViewDelegate <NSObject>
 
@@ -41,7 +42,8 @@
 
 
 
-@interface JSDismissiveTextView : UITextView
+//@interface JSDismissiveTextView : UITextView
+@interface JSDismissiveTextView : InMojiInputView
 
 @property (weak, nonatomic) id<JSDismissiveTextViewDelegate> keyboardDelegate;
 @property (strong, nonatomic) UIPanGestureRecognizer *dismissivePanGestureRecognizer;

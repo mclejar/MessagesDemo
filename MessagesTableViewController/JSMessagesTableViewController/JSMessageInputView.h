@@ -43,7 +43,7 @@
 
 #pragma mark - Initialization
 - (id)initWithFrame:(CGRect)frame
-           delegate:(id<UITextViewDelegate>)delegate;
+           delegate:(id<InMojiInputDelegate>)delegate;
 
 #pragma mark - Message input view
 - (void)adjustTextViewHeightBy:(CGFloat)changeInHeight;

@@ -28,11 +28,18 @@
 
 #import "AppDelegate.h"
 #import "DemoViewController.h"
+#import <InMoji/InMoji.h>
 
 @implementation AppDelegate
 
+#define InMojiAPIKey @"PXbJLxIDGgPALQJIq2w213dmuZRXhIW4t64qebHJ"
+#define InMojiAPISecret @"NQhdKVKtQFwl9vnTZFwxX7O3izqvy7BBzXlZAbPojRKiggRvO1Nt7Ko1qUi0H6lBOJOvZaz2vQAbPiRc"
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    NSDictionary* userParamsDictionary = [self exampleUserParams];
+    [[InMoji sharedInMoji] configureWithAPIKey:InMojiAPIKey secret:InMojiAPISecret userParams:userParamsDictionary];
+
     DemoViewController *vc = [DemoViewController new];
 	UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:vc];
     
@@ -43,6 +50,22 @@
     return YES;
 }
 							
+- (NSDictionary*) exampleUserParams{
+    NSDictionary* userParamsDictionary = @{InMojiUserParamFirstName:       @"First Name",
+                                           InMojiUserParamLastName:        @"Last Name",
+                                           InMojiUserParamAccountId:       @"account id",
+                                           InMojiUserParamAge:             @"13",
+                                           InMojiUserParamEmail:           @"email address",
+                                           InMojiUserParamEmploymentStatus:@"employmentStatus",
+                                           InMojiUserParamGender:          @"gender string",
+                                           InMojiUserParamHasKids:         @(YES),
+                                           InMojiUserParamIncome:          @"58000",
+                                           InMojiUserParamMarried:         @(NO),
+                                           InMojiUserParamPhoneNumber:     @"+1 555 (555)-5555",
+                                           InMojiUserParamRace:            @"race"};
+    return userParamsDictionary;
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application { }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application { }

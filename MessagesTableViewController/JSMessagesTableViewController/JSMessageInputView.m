@@ -55,12 +55,12 @@
 
 #pragma mark - Initialization
 - (id)initWithFrame:(CGRect)frame
-           delegate:(id<UITextViewDelegate>)delegate
+           delegate:(id<InMojiInputDelegate>)delegate
 {
     self = [super initWithFrame:frame];
     if(self) {
         [self setup];
-        self.textView.delegate = delegate;
+        self.textView.inmojiDelegate = delegate;
     }
     return self;
 }
@@ -95,17 +95,17 @@
     self.textView = [[JSDismissiveTextView  alloc] initWithFrame:CGRectMake(6.0f, 3.0f, width, height)];
     self.textView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.textView.backgroundColor = [UIColor whiteColor];
-    self.textView.scrollIndicatorInsets = UIEdgeInsetsMake(10.0f, 0.0f, 10.0f, 8.0f);
-    self.textView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
-    self.textView.scrollEnabled = YES;
-    self.textView.scrollsToTop = NO;
+//    self.textView.scrollIndicatorInsets = UIEdgeInsetsMake(10.0f, 0.0f, 10.0f, 8.0f);
+//    self.textView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
+//    self.textView.scrollEnabled = YES;
+//    self.textView.scrollsToTop = NO;
     self.textView.userInteractionEnabled = YES;
     self.textView.font = [JSBubbleView font];
-    self.textView.textColor = [UIColor blackColor];
+//    self.textView.textColor = [UIColor blackColor];
     self.textView.backgroundColor = [UIColor whiteColor];
-    self.textView.keyboardAppearance = UIKeyboardAppearanceDefault;
-    self.textView.keyboardType = UIKeyboardTypeDefault;
-    self.textView.returnKeyType = UIReturnKeyDefault;
+//    self.textView.keyboardAppearance = UIKeyboardAppearanceDefault;
+//    self.textView.keyboardType = UIKeyboardTypeDefault;
+//    self.textView.returnKeyType = UIReturnKeyDefault;
     [self addSubview:self.textView];
 	
     UIImageView *inputFieldBack = [[UIImageView alloc] initWithFrame:CGRectMake(self.textView.frame.origin.x - 1.0f,
@@ -133,25 +133,25 @@
 {
     CGRect prevFrame = self.textView.frame;
     
-    int numLines = MAX([JSBubbleView numberOfLinesForMessage:self.textView.text],
-                       [self.textView.text numberOfLines]);
+    int numLines = MAX([JSBubbleView numberOfLinesForMessage:self.textView.textContent],
+                       [self.textView.textContent numberOfLines]);
     
     self.textView.frame = CGRectMake(prevFrame.origin.x,
                                      prevFrame.origin.y,
                                      prevFrame.size.width,
                                      prevFrame.size.height + changeInHeight);
     
-    self.textView.contentInset = UIEdgeInsetsMake((numLines >= 6 ? 4.0f : 0.0f),
-                                                  0.0f,
-                                                  (numLines >= 6 ? 4.0f : 0.0f),
-                                                  0.0f);
-    
-    self.textView.scrollEnabled = (numLines >= 4);
-    
-    if(numLines >= 6) {
-        CGPoint bottomOffset = CGPointMake(0.0f, self.textView.contentSize.height - self.textView.bounds.size.height);
-        [self.textView setContentOffset:bottomOffset animated:YES];
-    }
+//    self.textView.contentInset = UIEdgeInsetsMake((numLines >= 6 ? 4.0f : 0.0f),
+//                                                  0.0f,
+//                                                  (numLines >= 6 ? 4.0f : 0.0f),
+//                                                  0.0f);
+//    
+//    self.textView.scrollEnabled = (numLines >= 4);
+//    
+//    if(numLines >= 6) {
+//        CGPoint bottomOffset = CGPointMake(0.0f, self.textView.contentSize.height - self.textView.bounds.size.height);
+//        [self.textView setContentOffset:bottomOffset animated:YES];
+//    }
 }
 
 + (CGFloat)textViewLineHeight
