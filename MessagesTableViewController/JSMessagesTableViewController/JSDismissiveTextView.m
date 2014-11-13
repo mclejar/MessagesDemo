@@ -30,9 +30,10 @@
 #import "JSDismissiveTextView.h"
 #import <CoreLocation/CoreLocation.h>
 #import <InMoji/InMoji.h>
+#import <InMoji/InMojiInputView.h>
 #import <InMoji/InMojiCampaign.h>
 
-@interface JSDismissiveTextView () <InMojiInputDelegate, InMojiLocationProvider, InMojiSelectionDelegate>
+@interface JSDismissiveTextView () <InMojiInputDelegate, InMojiLocationProvider, InMojiSelectionDelegate, InMojiSelectionDelegate>
 
 @property (strong, nonatomic) UIView *keyboard;
 @property (assign, nonatomic) CGFloat originalKeyboardY;
@@ -195,7 +196,7 @@
 #pragma mark -
 #pragma InMojiInputDelegate
 - (UIView*)viewForInMojiSelectorDisplay{
-    return self.inputAccessoryView;
+    return self.inputAccessoryView.superview.superview;
 }
 - (CGPoint) originForInMojiSelectorDisplay{
     return CGPointMake(10.0f,50.0f);

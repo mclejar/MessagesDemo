@@ -37,11 +37,18 @@
 #import "NSString+JSMessagesView.h"
 #import "UIView+AnimationOptionsForCurve.h"
 #import "UIColor+JSMessagesView.h"
-#import "JSDismissiveTextView.h"
+//#import "JSDismissiveTextView.h"
+#import <CoreLocation/CoreLocation.h>
+#import <InMoji/InMoji.h>
+#import <InMoji/InMojiInputView.h>
+#import <InMoji/InMojiCampaign.h>
 
 #define INPUT_HEIGHT 40.0f
 
-@interface JSMessagesViewController () <JSDismissiveTextViewDelegate>
+@interface JSMessagesViewController () <InMojiInputDelegate, CLLocationManagerDelegate, InMojiLocationProvider, InMojiSelectionDelegate>
+
+@property (nonatomic, strong) CLLocationManager* locationManager;
+@property (nonatomic, strong) CLLocation* bestAvailableLocation;
 
 - (void)setup;
 
@@ -71,20 +78,26 @@
     [self setBackgroundColor:[UIColor messagesBackgroundColor]];
     
     CGRect inputFrame = CGRectMake(0.0f, size.height - INPUT_HEIGHT, size.width, INPUT_HEIGHT);
-    self.inputToolBarView = [[JSMessageInputView alloc] initWithFrame:inputFrame delegate:self];
+//    self.inputToolBarView = [[JSMessageInputView alloc] initWithFrame:inputFrame delegate:self];
     
     // TODO: refactor
-    self.inputToolBarView.textView.dismissivePanGestureRecognizer = self.tableView.panGestureRecognizer;
-    self.inputToolBarView.textView.keyboardDelegate = self;
+//    self.inputToolBarView.textView.dismissivePanGestureRecognizer = self.tableView.panGestureRecognizer;
+//    self.inputToolBarView.textView.keyboardDelegate = self;
 
     UIButton *sendButton = [self sendButton];
     sendButton.enabled = NO;
-    sendButton.frame = CGRectMake(self.inputToolBarView.frame.size.width - 65.0f, 8.0f, 59.0f, 26.0f);
+//    sendButton.frame = CGRectMake(self.inputToolBarView.frame.size.width - 65.0f, 8.0f, 59.0f, 26.0f);
     [sendButton addTarget:self
                    action:@selector(sendPressed:)
          forControlEvents:UIControlEventTouchUpInside];
-    [self.inputToolBarView setSendButton:sendButton];
-    [self.view addSubview:self.inputToolBarView];
+//    [self.inputToolBarView setSendButton:sendButton];
+//    [self.view addSubview:self.inputToolBarView];
+    
+    self.inputView = [[InMojiInputView alloc] initWithFrame:inputFrame];
+    //set delete for input view
+    _inputView.inmojiDelegate = self;
+    _inputView.maxLines = 5;
+    [self.view addSubview:self.inputView];
 }
 
 - (UIButton *)sendButton
@@ -96,6 +109,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //Configure location provider
+    [[InMoji sharedInMoji] setLocationProvider:self];
+    _locationManager = [[CLLocationManager alloc] init];
+    [_locationManager setDelegate:self];
+    _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    _locationManager.distanceFilter = kCLDistanceFilterNone;
+    [_locationManager startUpdatingLocation];
+    
     [self setup];
 }
 
@@ -112,16 +134,25 @@
 											 selector:@selector(handleWillHideKeyboard:)
 												 name:UIKeyboardWillHideNotification
                                                object:nil];
+    
+    self.inputView.selectionDelegate = self;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [self.inputToolBarView resignFirstResponder];
+    [self.inputView resignFirstResponder];
     [self setEditing:NO animated:YES];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void) viewDidDisappear:(BOOL)animated{
+    [super viewDidDisappear:animated];
+    [_locationManager stopUpdatingLocation];
+    [_locationManager setDelegate:nil];
+    _locationManager = nil;
 }
 
 - (void)didReceiveMemoryWarning
@@ -135,7 +166,8 @@
     self.delegate = nil;
     self.dataSource = nil;
     self.tableView = nil;
-    self.inputToolBarView = nil;
+//    self.inputToolBarView = nil;
+    self.inputView = nil;
 }
 
 #pragma mark - View rotation
@@ -159,8 +191,8 @@
 #pragma mark - Actions
 - (void)sendPressed:(UIButton *)sender
 {
-    [self.delegate sendPressed:sender
-                      withText:[self.inputToolBarView.textView.textContent trimWhitespace]];
+//    [self.delegate sendPressed:sender
+//                      withText:[self.inputToolBarView.textView.textContent trimWhitespace]];
 }
 
 #pragma mark - Table view data source
@@ -263,8 +295,8 @@
 
 - (void)finishSend
 {
-    [self.inputToolBarView.textView  setTextContent:nil];
-    [self textViewDidChange:self.inputToolBarView.textView];
+    [self.inputView setTextContent:nil];
+//    [self textViewDidChange:self.inputView];
     [self.tableView reloadData];
     [self scrollToBottomAnimated:YES];
 }
@@ -372,7 +404,7 @@
                      animations:^{
                          CGFloat keyboardY = [self.view convertRect:keyboardRect fromView:nil].origin.y;
                          
-                         CGRect inputViewFrame = self.inputToolBarView.frame;
+                         CGRect inputViewFrame = self.inputView.frame;
                          CGFloat inputViewFrameY = keyboardY - inputViewFrame.size.height;
                          
                          // for ipad modal form presentations
@@ -380,14 +412,14 @@
                          if(inputViewFrameY > messageViewFrameBottom)
                              inputViewFrameY = messageViewFrameBottom;
 
-                         self.inputToolBarView.frame = CGRectMake(inputViewFrame.origin.x,
+                         self.inputView.frame = CGRectMake(inputViewFrame.origin.x,
                                                            inputViewFrameY,
                                                            inputViewFrame.size.width,
                                                            inputViewFrame.size.height);
                          
                          UIEdgeInsets insets = UIEdgeInsetsMake(0.0f,
                                                                 0.0f,
-                                                                self.view.frame.size.height - self.inputToolBarView.frame.origin.y - INPUT_HEIGHT,
+                                                                self.view.frame.size.height - self.inputView.frame.origin.y - INPUT_HEIGHT,
                                                                 0.0f);
                          
                          self.tableView.contentInset = insets;
@@ -400,25 +432,64 @@
 #pragma mark - Dismissive text view delegate
 - (void)keyboardDidScrollToPoint:(CGPoint)pt
 {
-    CGRect inputViewFrame = self.inputToolBarView.frame;
+    CGRect inputViewFrame = self.inputView.frame;
     CGPoint keyboardOrigin = [self.view convertPoint:pt fromView:nil];
     inputViewFrame.origin.y = keyboardOrigin.y - inputViewFrame.size.height;
-    self.inputToolBarView.frame = inputViewFrame;
+    self.inputView.frame = inputViewFrame;
 }
 
 - (void)keyboardWillBeDismissed
 {
-    CGRect inputViewFrame = self.inputToolBarView.frame;
+    CGRect inputViewFrame = self.inputView.frame;
     inputViewFrame.origin.y = self.view.bounds.size.height - inputViewFrame.size.height;
-    self.inputToolBarView.frame = inputViewFrame;
+    self.inputView.frame = inputViewFrame;
 }
 
 - (void)keyboardWillSnapBackToPoint:(CGPoint)pt
 {
-    CGRect inputViewFrame = self.inputToolBarView.frame;
+    CGRect inputViewFrame = self.inputView.frame;
     CGPoint keyboardOrigin = [self.view convertPoint:pt fromView:nil];
     inputViewFrame.origin.y = keyboardOrigin.y - inputViewFrame.size.height;
-    self.inputToolBarView.frame = inputViewFrame;
+    self.inputView.frame = inputViewFrame;
+}
+
+#pragma mark -
+#pragma InMojiLocationProvider
+- (CLLocation*)currentLocation
+{
+    return [_locationManager location];
+}
+
+//#pragma mark -
+//#pragma InMojiMessageLabelDelegate
+//- (void) inMojiLabelDidUpdateAttributedText:(InMojiLabel*)label forBoundingRect:(CGRect)boundingRect{
+//    CGRect frame = self.inmojilbl.frame;
+//    frame.size.height = boundingRect.size.height;
+//    self.inmojilbl.frame = frame;
+//}
+//- (UIView *)viewForInMojiActionDisplay{
+//    return self.view;
+//}
+
+#pragma mark -
+#pragma InMojiInputDelegate
+- (UIView*)viewForInMojiSelectorDisplay{
+    return self.view;
+}
+- (CGPoint) originForInMojiSelectorDisplay{
+    return CGPointMake(10.0f,50.0f);
+}
+- (CGFloat) heightForInMojiSelectorDisplay{
+    return 250.0f;
+}
+
+#pragma mark -
+#pragma InMojiSelectionDelegate
+
+- (BOOL) handleInMojiSelection:(InMojiCampaign*)campaign{
+    BOOL handled = YES;
+    //custom sticker handling
+    return handled;
 }
 
 @end

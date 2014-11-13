@@ -157,11 +157,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36273E471A13F31900008635 /* InMoji.framework in Frameworks */,
 				36273E4F1A13F36000008635 /* libsqlite3.dylib in Frameworks */,
 				36273E4D1A13F34C00008635 /* SystemConfiguration.framework in Frameworks */,
 				36273E4B1A13F33D00008635 /* MobileCoreServices.framework in Frameworks */,
 				36273E491A13F32E00008635 /* libxml2.2.dylib in Frameworks */,
-				36273E471A13F31900008635 /* InMoji.framework in Frameworks */,
 				881AE5C016D13E35008F7636 /* AudioToolbox.framework in Frameworks */,
 				881AE55D16D13CDC008F7636 /* UIKit.framework in Frameworks */,
 				881AE55F16D13CDC008F7636 /* Foundation.framework in Frameworks */,
@@ -522,6 +522,8 @@
 					"$(inherited)",
 					/Users/vivox/Downloads/1.3,
 					2/InMojiSampleApp/InMojiSampleApp/InMojiSDK,
+					/Users/vivox/Downloads/1.3,
+					2/InMojiSampleApp/InMojiSampleApp/InMojiSDK,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MessagesDemo/MessagesDemo-Prefix.pch";
@@ -538,6 +540,8 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					/Users/vivox/Downloads/1.3,
+					2/InMojiSampleApp/InMojiSampleApp/InMojiSDK,
 					/Users/vivox/Downloads/1.3,
 					2/InMojiSampleApp/InMojiSampleApp/InMojiSDK,
 				);
