@@ -37,6 +37,10 @@
 #import "JSBubbleView.h"
 #import "NSString+JSMessagesView.h"
 #import "UIImage+JSMessagesView.h"
+#import <CoreLocation/CoreLocation.h>
+#import <InMoji/InMoji.h>
+#import <InMoji/InMojiInputView.h>
+#import <InMoji/InMojiCampaign.h>
 
 #define SEND_BUTTON_WIDTH 78.0f
 
@@ -60,20 +64,19 @@
     self = [super initWithFrame:frame];
     if(self) {
         [self setup];
-        self.textView.inmojiDelegate = delegate;
     }
     return self;
 }
 
 - (void)dealloc
 {
-    self.textView = nil;
+    self.inputView = nil;
     self.sendButton = nil;
 }
 
 - (BOOL)resignFirstResponder
 {
-    [self.textView resignFirstResponder];
+    [self.inputView resignFirstResponder];
     return [super resignFirstResponder];
 }
 #pragma mark - Setup
@@ -92,30 +95,45 @@
     CGFloat width = self.frame.size.width - SEND_BUTTON_WIDTH;
     CGFloat height = [JSMessageInputView textViewLineHeight];
     
-    self.textView = [[JSDismissiveTextView  alloc] initWithFrame:CGRectMake(6.0f, 3.0f, width, height)];
-    self.textView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    self.textView.backgroundColor = [UIColor whiteColor];
+    self.inputView = [[InMojiInputView  alloc] initWithFrame:CGRectMake(6.0f, 3.0f, width, height)];
+    self.inputView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.inputView.backgroundColor = [UIColor whiteColor];
+//    self.inputView.scrollIndicatorInsets = UIEdgeInsetsMake(10.0f, 0.0f, 10.0f, 8.0f);
+//    self.inputView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
+//    self.inputView.scrollEnabled = YES;
+//    self.inputView.scrollsToTop = NO;
+    self.inputView.userInteractionEnabled = YES;
+    self.inputView.font = [JSBubbleView font];
+//    self.inputView.textColor = [UIColor blackColor];
+    self.inputView.backgroundColor = [UIColor whiteColor];
+//    self.superview.keyboardAppearance = UIKeyboardAppearanceDefault;
+//    self.inputView.keyboardType = UIKeyboardTypeDefault;
+//    self.inputView.returnKeyType = UIReturnKeyDefault;
+    [self addSubview:self.inputView];
+//    self.textView = [[JSDismissiveTextView  alloc] initWithFrame:CGRectMake(6.0f, 3.0f, width, height)];
+//    self.textView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+//    self.textView.backgroundColor = [UIColor whiteColor];
 //    self.textView.scrollIndicatorInsets = UIEdgeInsetsMake(10.0f, 0.0f, 10.0f, 8.0f);
 //    self.textView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
 //    self.textView.scrollEnabled = YES;
 //    self.textView.scrollsToTop = NO;
-    self.textView.userInteractionEnabled = YES;
-    self.textView.font = [JSBubbleView font];
+//    self.textView.userInteractionEnabled = YES;
+//    self.textView.font = [JSBubbleView font];
 //    self.textView.textColor = [UIColor blackColor];
-    self.textView.backgroundColor = [UIColor whiteColor];
+//    self.textView.backgroundColor = [UIColor whiteColor];
 //    self.textView.keyboardAppearance = UIKeyboardAppearanceDefault;
 //    self.textView.keyboardType = UIKeyboardTypeDefault;
 //    self.textView.returnKeyType = UIReturnKeyDefault;
-    [self addSubview:self.textView];
+//    [self addSubview:self.textView];
 	
-    UIImageView *inputFieldBack = [[UIImageView alloc] initWithFrame:CGRectMake(self.textView.frame.origin.x - 1.0f,
-                                                                                0.0f,
-                                                                                self.textView.frame.size.width + 2.0f,
-                                                                                self.frame.size.height)];
-    inputFieldBack.image = [UIImage inputField];
-    inputFieldBack.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
-    inputFieldBack.backgroundColor = [UIColor clearColor];
-    [self addSubview:inputFieldBack];
+//    UIImageView *inputFieldBack = [[UIImageView alloc] initWithFrame:CGRectMake(self.textView.frame.origin.x - 1.0f,
+//                                                                                0.0f,
+//                                                                                self.textView.frame.size.width + 2.0f,
+//                                                                                self.frame.size.height)];
+//    inputFieldBack.image = [UIImage inputField];
+//    inputFieldBack.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+//    inputFieldBack.backgroundColor = [UIColor clearColor];
+//    [self addSubview:inputFieldBack];
 }
 
 #pragma mark - Setters
@@ -131,12 +149,12 @@
 #pragma mark - Message input view
 - (void)adjustTextViewHeightBy:(CGFloat)changeInHeight
 {
-    CGRect prevFrame = self.textView.frame;
+    CGRect prevFrame = self.inputView.frame;
     
-    int numLines = MAX([JSBubbleView numberOfLinesForMessage:self.textView.textContent],
-                       [self.textView.textContent numberOfLines]);
+    int numLines = MAX([JSBubbleView numberOfLinesForMessage:self.inputView.textContent],
+                       [self.inputView.textContent numberOfLines]);
     
-    self.textView.frame = CGRectMake(prevFrame.origin.x,
+    self.inputView.frame = CGRectMake(prevFrame.origin.x,
                                      prevFrame.origin.y,
                                      prevFrame.size.width,
                                      prevFrame.size.height + changeInHeight);
@@ -149,8 +167,8 @@
 //    self.textView.scrollEnabled = (numLines >= 4);
 //    
 //    if(numLines >= 6) {
-//        CGPoint bottomOffset = CGPointMake(0.0f, self.textView.contentSize.height - self.textView.bounds.size.height);
-//        [self.textView setContentOffset:bottomOffset animated:YES];
+//        CGPoint bottomOffset = CGPointMake(0.0f, self.inputView.contentSize.height - self.inputView.bounds.size.height);
+//        [self.inputView setContentOffset:bottomOffset animated:YES];
 //    }
 }
 

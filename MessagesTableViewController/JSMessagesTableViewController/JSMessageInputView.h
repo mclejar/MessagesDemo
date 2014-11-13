@@ -34,11 +34,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "JSDismissiveTextView.h"
+//#import "JSDismissiveTextView.h"
+#import <InMoji/InMojiInputView.h>
 
 @interface JSMessageInputView : UIImageView
 
-@property (strong, nonatomic) JSDismissiveTextView *textView;
+//@property (strong, nonatomic) JSDismissiveTextView *textView;
+@property (strong, nonatomic) InMojiInputView *inputView;
 @property (strong, nonatomic) UIButton *sendButton;
 
 #pragma mark - Initialization

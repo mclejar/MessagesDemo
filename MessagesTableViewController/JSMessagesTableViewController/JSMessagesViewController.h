@@ -40,7 +40,6 @@
 #import "UIButton+JSMessagesView.h"
 #import <CoreLocation/CoreLocation.h>
 #import <InMoji/InMojiLabel.h>
-#import <InMoji/InMojiInputView.h>
 
 typedef enum {
     JSMessagesViewTimestampPolicyAll = 0,
@@ -89,8 +88,8 @@ typedef enum {
 @property (weak, nonatomic) id<JSMessagesViewDelegate> delegate;
 @property (weak, nonatomic) id<JSMessagesViewDataSource> dataSource;
 @property (strong, nonatomic) UITableView *tableView;
-//@property (strong, nonatomic) JSMessageInputView *inputToolBarView;
-@property (strong, nonatomic) InMojiInputView *inputView;
+@property (strong, nonatomic) JSMessageInputView *inputToolBarView;
+//@property (strong, nonatomic) InMojiInputView *inputView;
 @property (assign, nonatomic) CGFloat previousTextViewContentHeight;
 
 #pragma mark - Initialization
