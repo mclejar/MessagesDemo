@@ -34,6 +34,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <InMoji/InMojiLabel.h>
 
 extern CGFloat const kJSAvatarSize;
 
@@ -54,7 +55,7 @@ typedef enum {
 
 @property (assign, nonatomic) JSBubbleMessageType type;
 @property (assign, nonatomic) JSBubbleMessageStyle style;
-@property (copy, nonatomic) NSString *text;
+@property (strong, nonatomic) InMojiLabel *inmojilbl;
 @property (assign, nonatomic) BOOL selectedToShowCopyMenu;
 
 #pragma mark - Initialization

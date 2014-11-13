@@ -46,7 +46,7 @@ CGFloat const kJSAvatarSize = 50.0f;
 #define kPaddingBottom 8.0f
 #define kBubblePaddingRight 35.0f
 
-@interface JSBubbleView()
+@interface JSBubbleView() <InMojiMessageLabelDelegate>
 
 - (void)setup;
 
@@ -61,7 +61,7 @@ CGFloat const kJSAvatarSize = 50.0f;
 
 @synthesize type;
 @synthesize style;
-@synthesize text;
+@synthesize inmojilbl;
 @synthesize selectedToShowCopyMenu;
 
 #pragma mark - Setup
@@ -69,6 +69,16 @@ CGFloat const kJSAvatarSize = 50.0f;
 {
     self.backgroundColor = [UIColor clearColor];
     self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    CGFloat width = self.frame.size.width;
+    CGFloat height = [JSMessageInputView textViewLineHeight];
+    
+    self.inmojilbl = [[InMojiLabel  alloc] initWithFrame:CGRectMake(6.0f, 3.0f, width, height)];
+
+    self.inmojilbl.backgroundColor = [UIColor clearColor];
+    self.inmojilbl.font = [JSBubbleView font];
+    self.inmojilbl.messageDelegate = self;
+
 }
 
 #pragma mark - Initialization
@@ -105,7 +115,7 @@ CGFloat const kJSAvatarSize = 50.0f;
 
 - (void)setText:(NSString *)newText
 {
-    text = newText;
+    [self.inmojilbl setText:newText];
     [self setNeedsDisplay];
 }
 
@@ -118,7 +128,7 @@ CGFloat const kJSAvatarSize = 50.0f;
 #pragma mark - Drawing
 - (CGRect)bubbleFrame
 {
-    CGSize bubbleSize = [JSBubbleView bubbleSizeForText:self.text];
+    CGSize bubbleSize = [JSBubbleView bubbleSizeForText:[self.inmojilbl orignText]];
     return CGRectMake((self.type == JSBubbleMessageTypeOutgoing ? self.frame.size.width - bubbleSize.width : 0.0f),
                       kMarginTop,
                       bubbleSize.width,
@@ -154,7 +164,7 @@ CGFloat const kJSAvatarSize = 50.0f;
     CGRect bubbleFrame = [self bubbleFrame];
 	[image drawInRect:bubbleFrame];
 	
-	CGSize textSize = [JSBubbleView textSizeForText:self.text];
+	CGSize textSize = [JSBubbleView textSizeForText:[self.inmojilbl text]];
 	
     CGFloat textX = image.leftCapWidth - 3.0f + (self.type == JSBubbleMessageTypeOutgoing ? bubbleFrame.origin.x : 0.0f);
     
@@ -163,10 +173,12 @@ CGFloat const kJSAvatarSize = 50.0f;
                                   textSize.width,
                                   textSize.height);
     
-	[self.text drawInRect:textFrame
-                 withFont:[JSBubbleView font]
-            lineBreakMode:NSLineBreakByWordWrapping
-                alignment:NSTextAlignmentLeft];
+    [self addSubview:self.inmojilbl];
+
+    [[self.inmojilbl text] drawInRect:textFrame
+                             withFont:[JSBubbleView font]
+                        lineBreakMode:NSLineBreakByWordWrapping
+                            alignment:NSTextAlignmentLeft];
 }
 
 #pragma mark - Bubble view
@@ -254,6 +266,32 @@ CGFloat const kJSAvatarSize = 50.0f;
 + (int)numberOfLinesForMessage:(NSString *)txt
 {
     return (txt.length / [JSBubbleView maxCharactersPerLine]) + 1;
+}
+
+#pragma mark -
+#pragma InMojiMessageLabelDelegate
+- (void) inMojiLabelDidUpdateAttributedText:(InMojiLabel*)label forBoundingRect:(CGRect)boundingRect{
+    // This is a bit of a hack but shows how you can position the
+    // InmojiLabel on the screen.  The code below adjusts the view
+    // so it is over the speech bubbles
+    
+    CGRect frame = [self bubbleFrame];
+    // This is currently broken in the SDK
+//    frame.size.height = boundingRect.size.height;
+    if (self.type == JSBubbleMessageTypeIncoming) {
+        frame.origin.x += 17;
+        frame.origin.y += 5;
+        frame.size.width -= 20;
+    } else {
+        frame.origin.x += 10;
+        frame.origin.y += 5;
+        frame.size.width -= 15;
+    }
+    
+    self.inmojilbl.frame = frame;
+}
+- (UIView *)viewForInMojiActionDisplay{
+    return self.superview.superview.superview;
 }
 
 @end

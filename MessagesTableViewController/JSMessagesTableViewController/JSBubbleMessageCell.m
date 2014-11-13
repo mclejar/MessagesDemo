@@ -189,7 +189,9 @@
 #pragma mark - Message Cell
 - (void)setMessage:(NSString *)msg
 {
-    self.bubbleView.text = msg;
+    JSBubbleView *tmpView = self.bubbleView;
+    InMojiLabel *tmpLabel = tmpView.inmojilbl;
+    [tmpLabel setText:msg];
 }
 
 - (void)setTimestamp:(NSDate *)date
@@ -247,7 +249,7 @@
 
 - (void)copy:(id)sender
 {
-    [[UIPasteboard generalPasteboard] setString:self.bubbleView.text];
+    [[UIPasteboard generalPasteboard] setString:[self.bubbleView.inmojilbl orignText]];
     [self resignFirstResponder];
 }
 
